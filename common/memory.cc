@@ -66,9 +66,20 @@ std::string mem_string( const MemoryStatus & mem_status,
     oss << percentage_mem << '%';
     break;
     }
-  default: // Default mode, just show the used/total memory in MB
-    oss << static_cast< unsigned int >( mem_status.used_mem ) << '/'
-      << static_cast< unsigned int >( mem_status.total_mem ) << "MB";
+  default: // Default mode, just show the used/total memory in MB if total_mem
+           // is less than 1000 or GB otherwise
+    if( mem_status.total_mem < 1000 )
+    {
+      oss << static_cast< unsigned int >( mem_status.used_mem ) << '/'
+          << static_cast< unsigned int >( mem_status.total_mem ) << "MB ";
+    }
+    else
+    {
+      // reduce float precision
+      oss.precision( 1 );
+      oss << " "<< convert_unit( mem_status.used_mem, GIGABYTES, MEGABYTES )  << '/'
+          << convert_unit( mem_status.total_mem, GIGABYTES, MEGABYTES ) << "GB ";
+    }
   }
 
   if( use_colors )
